@@ -1,0 +1,6 @@
+image:
+  repository: generalscaler
+  tag: latest
+
+replicaCount: 1
+

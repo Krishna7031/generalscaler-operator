@@ -1,0 +1,21 @@
+apiVersion: autoscaling.example.com/v1
+kind: GeneralScaler
+metadata:
+  name: http-app-scaler
+  namespace: default
+spec:
+  targetDeployment: http-app
+  minReplicas: 2
+  maxReplicas: 10
+  metrics:
+    - type: prometheus
+      config:
+        query: "rate(http_requests_total{job='nginx'}[5m])"
+      targetValue: 100
+  policy:
+    type: slo
+  safety:
+    cooldownSeconds: 180
+    maxScaleUpRate: 3
+    maxScaleDownRate: 1
+

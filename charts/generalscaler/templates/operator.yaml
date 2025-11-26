@@ -1,0 +1,14 @@
+{{- /*
+Render the operator Deployment and RBAC from the deploy folder
+*/ -}}
+{{- $operator := .Files.Get "deploy/operator.yaml" | fromYaml -}}
+
+{{- /* Update image repository and tag from values.yaml */ -}}
+{{- if kindIs "Deployment" $operator }}
+{{- range $i, $container := index $operator.spec.template.spec "containers" }}
+{{- $_ := set $operator.spec.template.spec.containers $i "image" (printf "%s:%s" $.Values.image.repository $.Values.image.tag) }}
+{{- end }}
+{{- end }}
+
+{{- toYaml $operator | nindent 0 }}
+

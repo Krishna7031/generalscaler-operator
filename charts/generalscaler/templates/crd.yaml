@@ -1,0 +1,6 @@
+{{- /*
+Render the CustomResourceDefinition YAML from the deploy folder
+*/ -}}
+{{- $crd := .Files.Get "deploy/crd.yaml" | fromYaml -}}
+{{- toYaml $crd | nindent 0 }}
+

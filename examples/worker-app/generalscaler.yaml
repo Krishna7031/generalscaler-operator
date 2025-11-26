@@ -1,0 +1,23 @@
+apiVersion: autoscaling.example.com/v1
+kind: GeneralScaler
+metadata:
+  name: worker-app-scaler
+  namespace: default
+spec:
+  targetDeployment: worker-app
+  minReplicas: 2
+  maxReplicas: 10
+  metrics:
+    - type: redis
+      config:
+        host: redis
+        port: 6379
+        queue_key: "jobs"
+      targetValue: 50
+  policy:
+    type: slo
+  safety:
+    cooldownSeconds: 180
+    maxScaleUpRate: 2
+    maxScaleDownRate: 1
+

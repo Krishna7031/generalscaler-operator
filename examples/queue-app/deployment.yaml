@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: queue-app
+  namespace: default
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: queue-app
+  template:
+    metadata:
+      labels:
+        app: queue-app
+    spec:
+      serviceAccountName: queue-app
+      containers:
+      - name: subscriber
+        image: python:3.11-slim
+        command: ["python", "-c"]
+        args:
+          - |
+            from google.cloud import pubsub_v1
+            import time
+            subscriber = pubsub_v1.SubscriberClient()
+            subscription_path = subscriber.subscription_path('my-project', 'my-subscription')
+            print(f"Subscriber started on {subscription_path}")
+            def callback(message):
+              print(f"Processing message: {message.data}")
+              message.ack()
+              time.sleep(1)
+            subscriber.subscribe(subscription_path, callback=callback)
+            while True:
+              time.sleep(1)
+        resources:
+          requests:
+            cpu: 100m
+            memory: 64Mi
+

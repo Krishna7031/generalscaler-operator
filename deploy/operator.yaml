@@ -1,0 +1,64 @@
+cat > operator.yaml << 'EOF'
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: generalscaler-operator
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: generalscaler-operator
+  template:
+    metadata:
+      labels:
+        app: generalscaler-operator
+    spec:
+      serviceAccountName: generalscaler-operator
+      containers:
+      - name: operator
+        image: generalscaler:latest
+        imagePullPolicy: IfNotPresent
+        resources:
+          requests:
+            cpu: 100m
+            memory: 128Mi
+        env:
+        - name: KOPF_LOG_LEVEL
+          value: "INFO"
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: generalscaler-operator
+  namespace: default
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: generalscaler-operator
+rules:
+- apiGroups: ["autoscaling.example.com"]
+  resources: ["generalscalers"]
+  verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+- apiGroups: ["apps"]
+  resources: ["deployments"]
+  verbs: ["get", "list", "watch", "update", "patch"]
+- apiGroups: [""]
+  resources: ["events"]
+  verbs: ["create", "patch"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: generalscaler-operator
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: generalscaler-operator
+subjects:
+- kind: ServiceAccount
+  name: generalscaler-operator
+  namespace: default
+EOF
+

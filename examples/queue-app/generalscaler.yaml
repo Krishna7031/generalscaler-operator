@@ -1,0 +1,25 @@
+apiVersion: autoscaling.example.com/v1
+kind: GeneralScaler
+metadata:
+  name: queue-app-scaler
+  namespace: default
+spec:
+  targetDeployment: queue-app
+  minReplicas: 2
+  maxReplicas: 10
+  metrics:
+    - type: pubsub
+      config:
+        project_id: "my-project"
+        subscription: "my-subscription"
+      targetValue: 100
+  policy:
+    type: cost
+    config:
+      maxCostPerHour: 50
+      costPerPod: 0.5
+  safety:
+    cooldownSeconds: 300
+    maxScaleUpRate: 2
+    maxScaleDownRate: 1
+
