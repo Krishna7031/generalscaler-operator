@@ -4,7 +4,5 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir --upgrade -r requirements.txt
 COPY generalscaler/ ./generalscaler/
 COPY deploy/ ./deploy
-COPY controller.py .
 ENV KOPF_LOG_LEVEL=INFO
-CMD ["python", "controller.py"]
-
+CMD ["python", "generalscaler/controller.py"]
